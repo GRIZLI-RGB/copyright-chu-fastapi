@@ -1,5 +1,12 @@
-from typing import Any, Optional, Union
+from __future__ import annotations
+from datetime import datetime
+from typing import Any, Optional
 from pydantic import BaseModel, Field
+
+
+class OperationSchema(BaseModel):
+    status: bool
+    details: Optional[str] = None
 
 
 class PaymentMethodSchema(BaseModel):
@@ -31,6 +38,19 @@ class SettingsUpdateSchema(BaseModel):
     updated_at: Any
 
 
+class PaymentSchema(BaseModel):
+    id: int
+    status: str
+    sum: int
+    created_at: datetime
+    user_id: int
+    # user: UserSchema - тут выкидывает ошибку рекурсии какую-то
+
+
+class PaymentUpdateSchema(BaseModel):
+    status: str
+
+
 class UserSchema(BaseModel):
     id: int
     first_name: Optional[str] = None
@@ -42,10 +62,12 @@ class UserSchema(BaseModel):
     access_level: int = Field(ge=0, le=3, default=0)
     password: Optional[str] = None
     role: str = Field(default="user")
+    payments: Optional[list[PaymentSchema]] = Field(default=[])
 
 
 class UserCreateSchema(BaseModel):
     email: str
+    access_level: int = Field(gе=0, le=3)
 
 
 class UserUpdateSchema(BaseModel):

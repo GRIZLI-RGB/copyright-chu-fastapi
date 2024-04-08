@@ -1,4 +1,6 @@
-from sqlalchemy import Column, Integer, String, ARRAY, JSON, DateTime, func
+from sqlalchemy import Column, Integer, String, ARRAY, JSON, DateTime, func, ForeignKey
+from sqlalchemy.orm import relationship
+
 from database import Base
 
 # created_at = Column(DateTime, default=func.now())
@@ -27,3 +29,17 @@ class UserModel(Base):
     access_level = Column(Integer, default=0)
     password = Column(String)
     role = Column(String, default="user")
+
+    payments = relationship("PaymentModel", back_populates="user")
+
+
+class PaymentModel(Base):
+    __tablename__ = "payments"
+
+    id = Column(Integer, primary_key=True, index=True)
+    status = Column(String, default="pending")  # pending <-> success <-> failure
+    sum = Column(Integer)
+    created_at = Column(DateTime, default=func.now())
+
+    user_id = Column(Integer, ForeignKey("users.id"))
+    user = relationship("UserModel", back_populates="payments")
